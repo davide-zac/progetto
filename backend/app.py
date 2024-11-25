@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
+from urllib.parse import urljoin
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -49,6 +52,7 @@ def fetch_and_parse_page(url):
         return {"error": "Impossibile recuperare la pagina web"}
 
 
+    
 def fetch_and_transform_page(url):
     try:
         # Effettua la richiesta alla pagina
@@ -57,17 +61,24 @@ def fetch_and_transform_page(url):
         
         # Analizza l'HTML della pagina
         soup = BeautifulSoup(response.content, "html.parser")
-        
-        # Funzione ricorsiva per trasformare il testo in maiuscolo e preservare la struttura
+
+        # Funzione ricorsiva per trasformare il testo in maiuscolo
         def transform_text(element):
-            if element.string:  # Se è un nodo di testo
-                element.string = element.string.upper()  # Trasforma il testo in maiuscolo
-            else:
-                for child in element.children:  # Se ha figli, ricorri
+            for child in element.children:
+                if isinstance(child, NavigableString):  # Se è un nodo di testo
+                    child.replace_with(child.upper())  # Trasforma il testo in maiuscolo
+                elif child.name:  # Se è un tag, ricorri
                     transform_text(child)
 
-        # Applica la trasformazione alla struttura principale
+        # Trasforma il testo principale della pagina
         transform_text(soup)
+
+        # Correggi i percorsi delle risorse per preservare il frontend
+        for tag in soup.find_all(["link", "script", "img"]):
+            if tag.has_attr("href"):  # Corregge i link CSS o altri file
+                tag["href"] = urljoin(url, tag["href"])
+            if tag.has_attr("src"):  # Corregge i link a script o immagini
+                tag["src"] = urljoin(url, tag["src"])
 
         # Restituisce l'HTML modificato
         return str(soup)
@@ -75,6 +86,7 @@ def fetch_and_transform_page(url):
     except requests.exceptions.RequestException as e:
         print(f"Errore durante il recupero della pagina: {e}")
         return None
+
 @app.route('/transform', methods=['POST'])
 def transform_html():
     data = request.get_json()
