@@ -6,39 +6,32 @@ document.getElementById('analyzeBtn').addEventListener('click', async () => {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         console.log("Scheda attiva:", tab);
 
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          function: extractTextContent,
-        }, async (results) => {
-          console.log("Risultati dello script:", results);
-
-          if (results && results[0] && results[0].result) {
-            const pageContent = results[0].result;
-            console.log("Contenuto della pagina:", pageContent);
-
-            const response = await fetch('http://127.0.0.1:5000/count', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text: pageContent }),
-            });
-
-            const data = await response.json();
-            console.log("Risposta dal server Flask:", data);
-
-            document.getElementById('result').textContent = `Occorrenze di "Juventus": ${data.count}`;
-          } else {
-            console.error("Errore: Nessun risultato dallo script.");
-          }
+        // Invia l'URL della pagina al server Flask
+        const response = await fetch('http://127.0.0.1:5000/transform', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: tab.url }),
         });
+
+        if (response.ok) {
+            // Crea un blob e scarica il file
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'transformed_page.html';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            console.log("File HTML trasformato scaricato.");
+        } else {
+            console.error("Errore nella trasformazione della pagina:", await response.text());
+        }
     } catch (error) {
         console.error("Errore nell'analisi della pagina:", error);
     }
 });
 
-function extractTextContent() {
-    console.log("Eseguo extractTextContent sulla pagina.");
-    return document.body.innerText;
-}
 
   
   

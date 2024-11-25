@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
@@ -47,6 +47,8 @@ def fetch_and_parse_page(url):
     except requests.exceptions.RequestException as e:
         print(f"Errore durante il recupero della pagina: {e}")
         return {"error": "Impossibile recuperare la pagina web"}
+
+
 def fetch_and_transform_page(url):
     try:
         # Effettua la richiesta alla pagina
@@ -73,41 +75,26 @@ def fetch_and_transform_page(url):
     except requests.exceptions.RequestException as e:
         print(f"Errore durante il recupero della pagina: {e}")
         return None
-'''
-# Esempio di utilizzo
-if __name__ == "__main__":
-    url = "https://example.com"  # Sostituisci con l'URL desiderato
-    transformed_html = fetch_and_transform_page(url)
-    
-    if transformed_html:
-        print("Struttura HTML trasformata:\n")
-        print(transformed_html)  # Stampa l'HTML modificato
-'''
-@app.route('/count', methods=['POST'])
-def count_occurrences():
-    """
-    Endpoint per contare le occorrenze della parola "Juventus" o per analizzare un URL.
-
-    Returns:
-        JSON: Conteggio delle occorrenze o struttura di testo analizzata.
-    """
+@app.route('/transform', methods=['POST'])
+def transform_html():
     data = request.get_json()
-    text = data.get('text', '')
-    url = data.get('url', None)
+    url = data.get('url')
+    if not url:
+        return jsonify({'error': 'Nessun URL fornito'}), 400
 
-    if url:
-        # Analizza il contenuto di una pagina web se viene passato un URL
-        parsed_text = fetch_and_transform_page(url)
-        return jsonify(parsed_text)
-    elif text:
-        # Conta le occorrenze della parola "Juventus" nel testo
-        count = text.lower().count("juventus")
-        return jsonify({'count': count})
-    else:
-        return jsonify({"error": "Nessun testo o URL fornito"}), 400
+    # Trasforma il contenuto della pagina
+    transformed_html = fetch_and_transform_page(url)
+    if not transformed_html:
+        return jsonify({'error': 'Impossibile recuperare o trasformare la pagina'}), 500
 
+    # Salva il file trasformato
+    output_path = 'transformed_page.html'
+    with open(output_path, 'w', encoding='utf-8') as file:
+        file.write(transformed_html)
+
+    # Restituisce il file come risposta
+    return send_file(output_path, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
-
 
