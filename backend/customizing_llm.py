@@ -55,7 +55,7 @@ class LMStudioLLM(CustomLLM):
 
     @llm_completion_callback()
     def stream_complete(self, prompt: str, **kwargs: Any) -> CompletionResponseGen:
-        """Completamento asincrono (streaming)."""
+        """Completamento asincrono (streaming) con gestione migliorata."""
         try:
             response = self._send_request(prompt, stream=True)
             response_text = ""
@@ -63,18 +63,28 @@ class LMStudioLLM(CustomLLM):
             for line in response.iter_lines(decode_unicode=True):
                 if not line.strip():  # Ignora linee vuote
                     continue
-                if line.strip() == "[DONE]":  # Segnale di fine streaming
-                    print("Fine dello streaming.")
-                    break
+
                 # Rimuovi il prefisso 'data: ' se presente
                 if line.startswith("data: "):
                     line = line[len("data: "):]
+
+                # Verifica se la linea è il segnale di fine streaming
+                if line.strip() == "[DONE]":
+                    print("Fine dello streaming.")
+                    break
+
                 try:
-                    data = json.loads(line)  # Decodifica la linea come JSON
+                    # Decodifica la linea come JSON
+                    data = json.loads(line)
                     if "choices" in data and "text" in data["choices"][0]:
                         delta = data["choices"][0]["text"]
-                        response_text += delta
-                        yield CompletionResponse(text=response_text, delta=delta)
+
+                        # Aggiungi solo il contenuto nuovo evitando ripetizioni
+                        if not response_text.endswith(delta):
+                            response_text += delta
+                            # Stampa solo il delta per evitare confusione iniziale
+                            print(delta, end="", flush=True)
+                            yield CompletionResponse(text=response_text, delta=delta)
                 except json.JSONDecodeError as e:
                     # Log per capire il problema
                     print(f"Errore nel parsing JSON: {e}, linea ricevuta: {line}")
@@ -82,6 +92,8 @@ class LMStudioLLM(CustomLLM):
             raise ValueError(f"Errore nella comunicazione con il server LMStudio: {e}")
         except Exception as e:
             raise ValueError(f"Errore durante la richiesta in streaming: {e}")
+
+
 
 
 
