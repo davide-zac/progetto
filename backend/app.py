@@ -8,7 +8,6 @@ from alternative_custom_chat import CustomLLM, custom_chat
 
 app = Flask(__name__)
 CORS(app)
-
 llm = CustomLLM(
     model_name="meta-llama-3.1-8b-instruct",
     base_url="http://localhost:1234/v1",
