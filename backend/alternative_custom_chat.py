@@ -14,12 +14,11 @@ class CustomLLM(LMStudio):
         system_prompt = ChatMessage(
             role=MessageRole.SYSTEM,
             content=(
-                "You are an expert AI assistant. Please follow these rules strictly while generating responses: "
-                "1. Be concise and to the point. "
-                "2. Always provide sources when giving factual information. "
-                "3. Use a friendly and professional tone. "
-                "4. Avoid any sensitive or controversial topics. "
-                "5. Structure responses in short paragraphs."
+            "1. Short sentences: Each sentence expresses a single idea to reduce cognitive load."
+            "2. Frequent headings: They help break the text into readable blocks."
+            "3. Simplified language: Use of simple terms and active sentences."
+            "4. Elimination of unnecessary acronyms and symbols: For example, “& co” has been replaced with a clearer expression." 
+            "5. Recommended fonts (if applicable): If text is used digitally, use fonts such as Arial, Verdana or OpenDyslexic, with appropriate size and generous line spacing."
             ),
         )
         messages.insert(0, system_prompt)
@@ -60,15 +59,28 @@ llm = CustomLLM(
     temperature=0.5,
 )
 
-# Definisci i tuoi messaggi utente
-messages = [
-    ChatMessage(
-        role=MessageRole.USER,
-        content="What is the significance of the number 42?",
-    ),
-]
+def custom_chat(llm: CustomLLM, text: str) -> str:
+    # Crea i messaggi
+    messages = [
+        ChatMessage(
+            role=MessageRole.USER,
+            content=text,
+        ),
+    ]
 
-# Usa la tua LLM personalizzata con timeout personalizzato
-response = llm.chat(messages=messages, timeout=600.0)  # Timeout di 600 secondi
+    # Usa la tua LLM personalizzata con timeout personalizzato
+    response = llm.chat(messages=messages, timeout=600.0)  # Timeout di 600 secondi
+    return response
+
+# Inizializza la tua LLM personalizzata
+llm = CustomLLM(
+    model_name="meta-llama-3.1-8b-instruct",
+    base_url="http://localhost:1234/v1",
+    temperature=0.5,
+)
+
+# Usa la funzione custom_chat
+response = custom_chat(llm, "What is the significance of the number 42?")
 print(response)
+
 
