@@ -100,13 +100,9 @@ def transform_html():
     if not transformed_html:
         return jsonify({'error': 'Impossibile recuperare o trasformare la pagina'}), 500
 
-    # Salva il file trasformato
-    output_path = 'transformed_page.html'
-    with open(output_path, 'w', encoding='utf-8') as file:
-        file.write(transformed_html)
+    # Restituisce l'HTML trasformato come stringa
+    return jsonify({'transformed_html': transformed_html})
 
-    # Restituisce il file come risposta
-    return send_file(output_path, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
