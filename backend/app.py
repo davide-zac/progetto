@@ -3,11 +3,20 @@ from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import urljoin
-
+from alternative_custom_chat import CustomLLM, custom_chat
 
 
 app = Flask(__name__)
 CORS(app)
+
+
+llm = CustomLLM(
+    model_name="meta-llama-3.1-8b-instruct",
+    base_url="http://localhost:1234/v1",
+    temperature=0.5,
+)
+
+
 
 def fetch_and_parse_page(url):
     """
@@ -53,7 +62,7 @@ def fetch_and_parse_page(url):
 
 
     
-def fetch_and_transform_page(url):
+def fetch_and_transform_page_phase0(url):
     try:
         # Effettua la richiesta alla pagina
         response = requests.get(url)
@@ -87,6 +96,60 @@ def fetch_and_transform_page(url):
         print(f"Errore durante il recupero della pagina: {e}")
         return None
 
+
+
+
+def fetch_and_transform_with_llama(url):
+    try:
+        # Effettua la richiesta alla pagina
+        response = requests.get(url)
+        response.raise_for_status()  # Controlla se la richiesta è andata a buon fine
+        
+        # Analizza l'HTML della pagina
+        soup = BeautifulSoup(response.content, "html.parser")
+        
+        # Identifica i tag rilevanti
+        # ['title', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'li', 'blockquote']  
+        relevant_tags = ['title', 'h1', 'h2', 'h3', 'p', 'div']
+        min_text_length = 50  # Lunghezza minima per considerare un testo "rilevante"
+
+        # Funzione ricorsiva per trasformare i testi
+        def transform_text(element):
+            # Salta i nodi di tipo NavigableString e Doctype 
+            if isinstance(element, NavigableString) or element.name is None: 
+                return
+            
+            if element.name in relevant_tags and element.string:
+                # Controlla se il testo è sufficientemente lungo
+                text = element.string.strip()
+                if len(text) >= min_text_length:
+                    print(f"Testo rilevante trovato: {text}")
+                    # Usa LlamaIndex per ottenere la trasformazione
+                    transformed_text = custom_chat(llm,text)
+                    element.string = transformed_text  # Sostituisci il testo
+            else:
+                for child in element.children:# Se ha figli, ricorri
+                        transform_text(child)
+
+                    
+
+        # Applica la trasformazione alla struttura principale
+        transform_text(soup)
+
+        # Correggi i percorsi delle risorse per preservare il frontend
+        for tag in soup.find_all(["link", "script", "img"]):
+            if tag.has_attr("href"):  # Corregge i link CSS o altri file
+                tag["href"] = urljoin(url, tag["href"])
+            if tag.has_attr("src"):  # Corregge i link a script o immagini
+                tag["src"] = urljoin(url, tag["src"])
+
+        # Restituisce l'HTML modificato
+        return str(soup)
+
+    except requests.exceptions.RequestException as e:
+        print(f"Errore durante il recupero della pagina: {e}")
+        return None
+
 @app.route('/transform', methods=['POST'])
 def transform_html():
     data = request.get_json()
@@ -95,7 +158,7 @@ def transform_html():
         return jsonify({'error': 'Nessun URL fornito'}), 400
 
     # Trasforma il contenuto della pagina
-    transformed_html = fetch_and_transform_page(url)
+    transformed_html = fetch_and_transform_with_llama(url)
     if not transformed_html:
         return jsonify({'error': 'Impossibile recuperare o trasformare la pagina'}), 500
 
