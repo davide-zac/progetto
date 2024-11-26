@@ -6,7 +6,9 @@ llm=LMStudioLLM()
 question = "Qual è la capitale della Francia?"
 # response = llm.complete(prompt=question)
 # print(response.text)
-# Usa il metodo stream_complete per generare la risposta in streaming
-question = "Qual è la capitale della Francia?"
-for token in llm.stream_complete(question):
-    print(token, end="", flush=True)
+# metodo stream_complete per generare la risposta in streaming
+# question = "Qual è la capitale della Francia?"
+# for token in llm.stream_complete(question):
+#     print(token, end="", flush=True)
+
+
