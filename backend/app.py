@@ -1,4 +1,4 @@
-import llm
+import llm_groq
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -13,7 +13,7 @@ def transform():
     #simplified_headings = [f"Simplified: {heading}" for heading in headings]
     #simplified_paragraphs = [f"Simplified: {paragraph}" for paragraph in paragraphs]
     print('running')
-    simplified_content = llm.simplify_content(headings,paragraphs)
+    simplified_content = llm_groq.simplify_content(headings,paragraphs)
     print('runned')
     
     return jsonify({

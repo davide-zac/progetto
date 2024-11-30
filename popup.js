@@ -69,7 +69,7 @@ function injectSimplifiedContent(simplifiedContent) {
         const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
         headings.forEach((heading, index) => {
             if (simplifiedContent.headings[index]) {
-                heading.textContent = simplifiedContent.headings[index];
+                heading.innerHTML = simplifiedContent.headings[index]; // Use innerHTML for HTML content
             }
         });
     }
@@ -79,10 +79,11 @@ function injectSimplifiedContent(simplifiedContent) {
         const paragraphs = document.querySelectorAll('p');
         paragraphs.forEach((paragraph, index) => {
             if (simplifiedContent.paragraphs[index]) {
-                paragraph.textContent = simplifiedContent.paragraphs[index];
+                paragraph.innerHTML = simplifiedContent.paragraphs[index]; // Use innerHTML for HTML content
             }
         });
     }
 
     console.log("Contenuto semplificato iniettato con successo.");
 }
+
