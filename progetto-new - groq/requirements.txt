@@ -1,0 +1,7 @@
+flask
+bs4
+requests
+flask_cors
+openai
+llama-index
+llama-index-llms-openai
