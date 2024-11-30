@@ -81,7 +81,7 @@ def simplify_content(headings, paragraphs):
             messages =  [{"role": "system", "content": guidelines},
                         # Set a user message for the assistant to respond to.
                         {"role": "user", "content": heading,}],
-            model= "llama-3.1-70b-versatile",), #"llama-3.1-8b-instant",)     #"llama3-8b-8192",)
+            model= "llama-3.1-70b-versatile",) #"llama-3.1-8b-instant",)     #"llama3-8b-8192",)
             simple_heading = chat_completion.choices[0].message.content
             
             # MARKDOWN TO HTML (if needed)
