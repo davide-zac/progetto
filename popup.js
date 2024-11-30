@@ -5,21 +5,17 @@ document.getElementById('analyzeBtn').addEventListener('click', async () => {
     console.log("Bottone cliccato, avvio analisi...");
 
     try {
-        // Ottieni la scheda attiva
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         console.log("Scheda attiva:", tab);
 
-        // Esegui uno script per estrarre il testo da headings e paragrafi nella scheda attiva
         const extractedContent = await chrome.scripting.executeScript({
             target: { tabId: tab.id },
-            func: extractPageContent, // Funzione eseguita nel contesto della pagina
+            func: extractPageContent,
         });
 
-        // Controlla i risultati
         const { headings, paragraphs } = extractedContent[0].result;
         console.log("Contenuto estratto:", { headings, paragraphs });
 
-        // Invia il testo al server Flask
         const response = await fetch('http://127.0.0.1:5000/transform', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -34,56 +30,78 @@ document.getElementById('analyzeBtn').addEventListener('click', async () => {
 
         console.log("Dati semplificati ricevuti dal server:", simplifiedData);
 
-        // Sostituisci i contenuti nella pagina con quelli semplificati
         chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: injectSimplifiedContent,
-            args: [simplifiedData], // Pass the simplified content to the content script
+            args: [simplifiedData],
         });
     } catch (error) {
         console.error("Errore nell'analisi:", error);
     }
 });
 
-/**
- * Funzione per estrarre i contenuti di headings e paragrafi dalla pagina.
- * Viene eseguita nel contesto della pagina attiva.
- */
+// Dropdown per cambiare il font
+document.getElementById('fontSelect').addEventListener('change', async (event) => {
+    const selectedFont = event.target.value;
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    // Execute the changeFont function in the context of the active tab
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: changeFont,
+        args: [selectedFont] // Pass the selected font as an argument
+    });
+});
+
 function extractPageContent() {
     const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(h => h.textContent.trim());
     const paragraphs = Array.from(document.querySelectorAll('p')).map(p => p.textContent.trim());
-
     return { headings, paragraphs };
 }
 
-/**
- * Funzione per iniettare i contenuti semplificati nella pagina.
- * Viene eseguita nel contesto della pagina attiva.
- * @param {Object} simplifiedContent - Oggetto contenente headings e paragraphs semplificati.
- */
 function injectSimplifiedContent(simplifiedContent) {
-    console.log("Iniezione del contenuto semplificato nella pagina...");
-
-    // Sostituisci titoli
     if (simplifiedContent.headings) {
         const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
         headings.forEach((heading, index) => {
             if (simplifiedContent.headings[index]) {
-                heading.innerHTML = simplifiedContent.headings[index]; // Use innerHTML for HTML content
+                heading.innerHTML = simplifiedContent.headings[index];
             }
         });
     }
 
-    // Sostituisci paragrafi
     if (simplifiedContent.paragraphs) {
         const paragraphs = document.querySelectorAll('p');
         paragraphs.forEach((paragraph, index) => {
             if (simplifiedContent.paragraphs[index]) {
-                paragraph.innerHTML = simplifiedContent.paragraphs[index]; // Use innerHTML for HTML content
+                paragraph.innerHTML = simplifiedContent.paragraphs[index];
             }
         });
     }
+}
 
-    console.log("Contenuto semplificato iniettato con successo.");
+function changeFont(font) {
+    if (font === 'OpenDyslexic') {
+        // Inject the font if not already present
+        const styleId = 'open-dyslexic-font';
+        let styleElement = document.getElementById(styleId);
+
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = styleId;
+            styleElement.innerHTML = `
+                @font-face {
+                    font-family: 'OpenDyslexic';
+                    src: url(${chrome.runtime.getURL('fonts/OpenDyslexic-Regular.otf')}) format('opentype');
+                }
+            `;
+            document.head.appendChild(styleElement);
+        }
+
+        // Apply the OpenDyslexic font to the body
+        document.body.style.fontFamily = 'OpenDyslexic, sans-serif';
+    } else {
+        // Apply other fonts
+        document.body.style.fontFamily = font;
+    }
 }
 

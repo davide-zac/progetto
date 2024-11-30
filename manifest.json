@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Conteggio Juventus",
+    "name": "DislexIA Web Reader",
     "version": "1.0",
-    "description": "Conta le occorrenze della parola Juventus su una pagina web.",
+    "description": "Rewriting web content to make it dyslexia friendly.",
     "permissions": ["scripting", "activeTab"],
     "host_permissions": ["<all_urls>"],
     "action": {
@@ -13,6 +13,14 @@
         "128": "icon.png"
       }
     },
+    "web_accessible_resources": [
+    {
+      "resources": [
+        "fonts/OpenDyslexic-Regular.otf"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
     "background": {
       "service_worker": "background.js"
     }

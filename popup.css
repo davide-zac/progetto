@@ -1,0 +1,74 @@
+/* Font-face declaration for OpenDyslexic */
+@font-face {
+    font-family: 'OpenDyslexic';
+    src: url('./fonts/OpenDyslexic-Regular.otf') format('opentype'),
+         url('./fonts/OpenDyslexic-Bold.otf') format('opentype'),
+         url('./fonts/OpenDyslexic-Italic.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Global styles */
+body {
+    font-family: Arial, sans-serif; /* Default fallback font */
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+/* Inherit fonts for elements where dynamic fonts might apply */
+h1, p, button, select, label {
+    font-family: inherit; /* Will dynamically inherit the font family */
+}
+
+/* Header styles */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #555;
+}
+
+/* Button styles */
+button {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    margin: 20px 0;
+    border: none;
+    border-radius: 5px;
+    background-color: #73a2d1;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Label styles */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Dropdown styles */
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Result text styles */
+#result {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
