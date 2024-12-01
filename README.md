@@ -1,4 +1,4 @@
-# ReadIT: An IA google chrome extension helping people with dyslexia 
+# ReadIT: An IA google chrome extension helping people with DSA 
 
 This is the repo for the demo of ReadIT. ReadIT is a google chrome extension that leverages Llama, the opensource LLM model from Meta, to process the text of any website and help dyslexic people in reading.
 
