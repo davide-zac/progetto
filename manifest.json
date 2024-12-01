@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "DislexIA Web Reader",
+    "name": "ReadIT",
     "version": "1.0",
     "description": "Rewriting web content to make it dyslexia friendly.",
     "permissions": ["scripting", "activeTab"],
@@ -9,6 +9,9 @@
       "default_popup": "popup.html",
       "default_icon": {
         "16": "icon16.png",
+        "19": "icon19.png",
+        "32": "icon32.png",
+        "38": "icon38.png",
         "48": "icon48.png",
         "128": "icon128.png"
       }
