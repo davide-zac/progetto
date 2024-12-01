@@ -11,16 +11,11 @@
 
 /* Global styles */
 body {
-    font-family: Arial, sans-serif; /* Default fallback font */
-    background-color: #f9f9f9;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #ffffff;
     margin: 0;
     padding: 20px;
     color: #333;
-}
-
-/* Inherit fonts for elements where dynamic fonts might apply */
-h1, p, button, select, label {
-    font-family: inherit; /* Will dynamically inherit the font family */
 }
 
 /* Header styles */
@@ -28,7 +23,7 @@ h1 {
     font-size: 24px;
     margin-bottom: 20px;
     text-align: center;
-    color: #555;
+    color: #333;
 }
 
 /* Button styles */
@@ -38,15 +33,25 @@ button {
     padding: 10px 20px;
     margin: 20px 0;
     border: none;
-    border-radius: 5px;
-    background-color: #1e6ebe;
+    border-radius: 8px;
+    background-color: #007BFF;
     color: white;
     font-size: 16px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-    background-color: #1a4a7d;
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    background-color: #004080;
+    transform: translateY(0);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Label styles */
@@ -64,6 +69,12 @@ select {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+select:focus {
+    border-color: #007BFF;
+    outline: none;
 }
 
 /* Result text styles */
@@ -72,4 +83,30 @@ select {
     text-align: center;
     font-size: 14px;
     color: #666;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
+
+#result.visible {
+    opacity: 1;
+}
+
+/* Reminder styles */
+.reminder {
+    background-color: #f1faee;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+}
+
+#feedback {
+    font-size: 1.2rem;
+    color: #4caf50; /* Green text for positive feedback */
+    margin-top: 20px;
+    text-align: center;
+    display: none; /* Hidden by default */
+  }
+  

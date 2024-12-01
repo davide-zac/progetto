@@ -7,10 +7,11 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h1>DislessIA</h1>
+  <h1>Readit</h1>
   <button id="analyzeBtn">Simplify ✨</button>
   <button id="readAloudBtn">Text to Speech 🗣️</button>
   <!--<button id="stopReadAloudBtn">Interrompi</button>-->
+  <!--<<button id="generate-map-button">Create Concept Map 💭</button>-->
   
   <label for="fontSelect">Select Font:</label>
   <select id="fontSelect">
@@ -20,15 +21,37 @@
     <option value="OpenDyslexic">OpenDyslexic</option>
   </select>
 
-  
+  <div id="feedback"></div> <!-- Unique element for captions -->
 
-  
-  <div style="width: 200px;">
-    <p id="result"></p>
+
+  <div class="reminder" style="width: 300px;">
+    Remember: Everyone learns differently. Take breaks, stay positive, and ask for help when you need it.
   </div>
+  
+  <!--Captions--> 
+  <script>
+    const analyzeBtnCap = document.getElementById('analyzeBtn');
+    const readAloudBtnCap = document.getElementById('readAloudBtn');
+    const feedback = document.getElementById('feedback'); // Feedback captions container
+
+    // Function to show feedback
+    function showFeedback(message) {
+      feedback.textContent = message; // Update text
+      feedback.style.display = 'block'; // Ensure it's visible
+    }
+
+    // Event listeners for buttons
+    analyzeBtnCap.addEventListener('click', () => {
+      showFeedback('Simplifying text ✨ ... Check the page for updates');
+    });
+
+    readAloudBtnCap.addEventListener('click', () => {
+      showFeedback('Text-to-speech active! 🗣️');
+    });
+
+  </script>
 
   
-
   <script src="popup.js"></script>
   <script src="readout.js"></script>
 </body>
