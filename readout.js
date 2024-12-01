@@ -14,6 +14,9 @@ function enableParagraphReadAloud() {
     let currentUtterance = null;
     let readingParagraph = null;
 
+    // Infer language from the page
+    const pageLang = document.documentElement.lang || 'en-US'; // Default to English if no lang attribute
+
     // Function to stop any ongoing speech
     const stopReading = () => {
         if (currentUtterance) {
@@ -41,7 +44,7 @@ function enableParagraphReadAloud() {
         icon.style.display = 'flex';
         icon.style.alignItems = 'center';
         icon.style.justifyContent = 'center';
-        //icon.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)';
+        icon.style.zIndex = '9999'; // Ensure it appears on top of other elements
         icon.textContent = '▶'; // Play icon
         return icon;
     };
@@ -75,7 +78,7 @@ function enableParagraphReadAloud() {
                 } else {
                     stopReading(); // Stop any ongoing speech
                     currentUtterance = new SpeechSynthesisUtterance(paragraph.textContent);
-                    currentUtterance.lang = 'it-IT'; // Change as needed
+                    currentUtterance.lang = pageLang; // Infer language dynamically
                     currentUtterance.rate = 1; // Normal speed
                     currentUtterance.pitch = 1; // Normal pitch
                     currentUtterance.onend = () => {
@@ -93,25 +96,16 @@ function enableParagraphReadAloud() {
             paragraph.style.backgroundColor = ''; // Remove highlight
             if (!playIcon.matches(':hover')) {
                 setTimeout(() => {
-                    playIcon.style.display = 'none'; }, 10000); // 2000 milliseconds = 2 seconds
-                
-                //playIcon.style.display = 'none'; // Hide the icon if not hovering over it
+                    playIcon.style.display = 'none'; }, 2000); // Hide the icon after 2 seconds
             }
         });
     });
 
     // Hide the icon when clicking elsewhere
-    //document.addEventListener('click', (event) => {
-    //    if (playIcon && !playIcon.contains(event.target)) {
-    //        playIcon.style.display = 'none';
-    //    }
-    //});
-
     document.addEventListener('click', (event) => {
         if (playIcon && !playIcon.contains(event.target)) {
-           setTimeout(() => {
-               playIcon.style.display = 'none'; }, 2000); // 2000 milliseconds = 2 seconds
-               }
-           });
+            setTimeout(() => {
+                playIcon.style.display = 'none'; }, 2000); // Hide the icon after 2 seconds
+        }
+    });
 }
-
